@@ -30,6 +30,7 @@ selected_values = [
     ("Property type", "property.location.type"),
     ("Region", "property.location.regionCode"),
     ("District", "property.location.district"),
+    ("Province", "property.location.province"),
     ("Subtype", "property.subtype"),
     ("Price", "price.mainValue"),
     ("Type of sale", "price.type"),
@@ -47,8 +48,8 @@ selected_values = [
     ("Condition", "property.building.condition"),
     ("EPC score", "transaction.certificates.epcScore"),
     ("Latitude", "property.location.latitude"),
-    ("Longitude", "property.location.longitude")
-    
+    ("Longitude", "property.location.longitude"),
+    ("Property url", "url")
 ]
 #Start a Sesson as session
 session = requests.Session()
@@ -74,6 +75,7 @@ def get_property(url, session):
         if start_index != -1 and end_index != -1: #check if we are not out of bounds with the string
             json_data = html_content[start_index:end_index] #create the dictionary from the resulting string {}
             house_dict = json.loads(json_data) #seperate dict for the filtered result
+            house_dict["url"] = url  # Add the URL to the dictionary
             return house_dict, json_data
     except (requests.exceptions.RequestException, json.JSONDecodeError) as e:
         print(f"Error occurred during scraping: {e}")
@@ -214,6 +216,7 @@ def process_url(url, session):
         id_match = re.search(r"/(\d+)$", url)
         if id_match:
             filtered_house_dict["id"] = int(id_match.group(1))
+        filtered_house_dict["Property url"] = url  # Add "Property url" field
         house_details.append(filtered_house_dict)
         raw_data.append({"url": url, "json_data": raw_json_data})
     else:
